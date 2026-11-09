@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="referrer" content="no-referrer-when-downgrade" />
+  <title>WebGIS Navigation Dashboard | Islamabad Mosques - Emaan Abid (24-ARID-2205)</title>
+  
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Top Header Bar -->
+  <header class="dashboard-header">
+    <div class="header-left">
+      <img src="assets/Arid Logo.png" alt="PMAS-Arid Agriculture University Logo" class="header-logo" onerror="this.src='assets/Logo.png'" />
+      <div class="header-text">
+        <h1 class="header-title">Interactive WebGIS Navigation Dashboard</h1>
+        <p class="header-subtitle">
+          <span class="badge-tag"><i class="fa-solid fa-map-location-dot"></i> RSG-505: WebGIS Development</span>
+          <span class="badge-tag study-area"><i class="fa-solid fa-city"></i> Islamabad Landmarks</span>
+          <span class="badge-tag category-tag"><i class="fa-solid fa-mosque"></i> Category: Mosque</span>
+        </p>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="live-pill">
+        <span class="pulsing-indicator"></span>
+        <span>OSRM Routing Engine Online</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main 3-Column Workspace -->
+  <div class="main-container">
+    
+    <!-- Left Sidebar: Locations & Route Details -->
+    <aside class="sidebar left-sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-title">
+          <i class="fa-solid fa-compass"></i>
+          <h2>Destinations & Route</h2>
+        </div>
+        <span class="badge-counter">2 Mosques</span>
+      </div>
+
+      <!-- Geolocation / Origin Control -->
+      <section class="section-card origin-section">
+        <div class="section-label">
+          <i class="fa-solid fa-street-view"></i> Trip Starting Point (Origin)
+        </div>
+        <div class="origin-status" id="origin-status-text">
+          <i class="fa-solid fa-location-crosshairs"></i> Initialized at Zero Point, Islamabad
+        </div>
+        <div class="origin-buttons-grid">
+          <button id="btn-live-gps" class="btn btn-primary" title="Detect live position via browser Geolocation API">
+            <i class="fa-solid fa-location-arrow"></i> Live GPS
+          </button>
+          <button id="btn-arid-campus" class="btn btn-arid" title="Set origin to PMAS-Arid Agriculture University Campus">
+            <i class="fa-solid fa-graduation-cap"></i> Arid Univ
+          </button>
+          <button id="btn-preset-location" class="btn btn-secondary" title="Reset origin to central Islamabad (Zero Point)">
+            <i class="fa-solid fa-arrow-rotate-left"></i> Zero Point
+          </button>
+          <button id="btn-pick-origin" class="btn btn-pick" title="Click anywhere on the map to set custom origin">
+            <i class="fa-solid fa-hand-pointer"></i> Pick on Map
+          </button>
+        </div>
+        <div class="coords-display" id="origin-coords">
+          Lat: 33.6938° N | Lng: 73.0652° E
+        </div>
+      </section>
+
+      <!-- Locations List (Left Sidebar required items) -->
+      <section class="section-card">
+        <div class="section-label">
+          <i class="fa-solid fa-map-pin"></i> Select Destination Mosque
+        </div>
+
+        <!-- Location 1: Faisal Mosque -->
+        <div class="location-card" id="card-faisal" onclick="selectLocation('faisal')">
+          <div class="location-header">
+            <div class="loc-icon-badge">
+              <i class="fa-solid fa-mosque"></i>
+            </div>
+            <div class="loc-titles">
+              <h3 class="loc-name">1. Faisal Mosque</h3>
+              <p class="loc-sub">Shah Faisal Masjid, Margalla Foothills</p>
+            </div>
+          </div>
+          <p class="loc-desc">
+            National mosque of Pakistan and one of the largest mosques in the world, iconic contemporary Turkish-inspired design.
+          </p>
+          <div class="loc-meta">
+            <span><i class="fa-solid fa-crosshairs"></i> 33.7297° N, 73.0372° E</span>
+            <span class="status-chip">Landmark</span>
+          </div>
+          <button class="btn btn-route" onclick="event.stopPropagation(); selectLocation('faisal')">
+            <i class="fa-solid fa-route"></i> Calculate Route to Faisal Mosque
+          </button>
+        </div>
+
+        <!-- Location 2: Lal Masjid -->
+        <div class="location-card" id="card-lal" onclick="selectLocation('lal')">
+          <div class="location-header">
+            <div class="loc-icon-badge red-badge">
+              <i class="fa-solid fa-mosque"></i>
+            </div>
+            <div class="loc-titles">
+              <h3 class="loc-name">2. Lal Masjid</h3>
+              <p class="loc-sub">Red Mosque, Sector G-6/2, Islamabad</p>
+            </div>
+          </div>
+          <p class="loc-desc">
+            Historic central red-stone mosque founded in 1965, situated in the heart of Islamabad's diplomatic and civil quarters.
+          </p>
+          <div class="loc-meta">
+            <span><i class="fa-solid fa-crosshairs"></i> 33.7088° N, 73.0857° E</span>
+            <span class="status-chip">Heritage</span>
+          </div>
+          <button class="btn btn-route" onclick="event.stopPropagation(); selectLocation('lal')">
+            <i class="fa-solid fa-route"></i> Calculate Route to Lal Masjid
+          </button>
+        </div>
+      </section>
+
+      <!-- Route Navigation Summary Card -->
+      <section class="section-card route-info-panel" id="route-panel">
+        <div class="section-label">
+          <i class="fa-solid fa-signs-post"></i> Active Route Telemetry
+        </div>
+        <div class="route-metrics-grid">
+          <div class="metric-box">
+            <span class="metric-label"><i class="fa-solid fa-road"></i> Distance</span>
+            <span class="metric-value" id="val-distance">-- km</span>
+          </div>
+          <div class="metric-box">
+            <span class="metric-label"><i class="fa-solid fa-stopwatch"></i> Estimated Time</span>
+            <span class="metric-value highlight" id="val-time">-- min</span>
+          </div>
+        </div>
+        <div class="route-destination-summary">
+          <div class="dest-label">Active Target:</div>
+          <div class="dest-target" id="dest-target-name">None Selected (Click a mosque above)</div>
+        </div>
+        <div class="route-status-msg" id="route-status-msg">
+          <i class="fa-solid fa-circle-info"></i> Click any mosque card to calculate optimal driving directions.
+        </div>
+        <button id="btn-clear-route" class="btn btn-sm-outline" onclick="clearActiveRoute()" style="display:none;">
+          <i class="fa-solid fa-trash-can"></i> Clear Route
+        </button>
+      </section>
+    </aside>
+
+    <!-- Center: Interactive Leaflet Map -->
+    <main class="map-container-wrapper">
+      <div id="map"></div>
+
+      <!-- Floating Map Overlay HUD -->
+      <div class="map-floating-overlay" id="map-floating-hud">
+        <div class="hud-item">
+          <span class="hud-label">Destination:</span>
+          <span class="hud-value" id="hud-dest">Faisal Mosque</span>
+        </div>
+        <div class="hud-divider"></div>
+        <div class="hud-item">
+          <span class="hud-label">Distance:</span>
+          <span class="hud-value" id="hud-dist">-- km</span>
+        </div>
+        <div class="hud-divider"></div>
+        <div class="hud-item">
+          <span class="hud-label">Est. Travel Time:</span>
+          <span class="hud-value highlight" id="hud-time">-- min</span>
+        </div>
+      </div>
+
+      <!-- Map Quick Control Bar -->
+      <div class="map-controls-bar">
+        <button class="map-ctrl-btn" onclick="fitFullView()" title="Fit all locations on map">
+          <i class="fa-solid fa-expand"></i> Fit Overview
+        </button>
+        <button class="map-ctrl-btn" onclick="centerOnUser()" title="Center on current origin">
+          <i class="fa-solid fa-crosshairs"></i> Center Origin
+        </button>
+      </div>
+    </main>
+
+    <!-- Right Sidebar: Student Name, ARID No, Technical Specs -->
+    <aside class="sidebar right-sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-title">
+          <i class="fa-solid fa-id-card-clip"></i>
+          <h2>Student Profile</h2>
+        </div>
+      </div>
+
+      <!-- Student Credentials Card -->
+      <div class="student-card">
+        <div class="avatar-ring">
+          <i class="fa-solid fa-user-graduate"></i>
+        </div>
+        <h3 class="student-name">EMAAN ABID</h3>
+        <p class="student-arid">24-ARID-2205</p>
+        <span class="academic-badge">BS Geo-Informatics</span>
+
+        <div class="student-info-table">
+          <div class="table-row">
+            <span class="cell-label"><i class="fa-solid fa-book-bookmark"></i> Course:</span>
+            <span class="cell-val">RSG-505: WebGIS</span>
+          </div>
+          <div class="table-row">
+            <span class="cell-label"><i class="fa-solid fa-flask-vial"></i> Lab Assignment:</span>
+            <span class="cell-val">Lab 03 (Navigation)</span>
+          </div>
+          <div class="table-row">
+            <span class="cell-label"><i class="fa-solid fa-chalkboard-user"></i> Lecturer:</span>
+            <span class="cell-val">Sir Jaffar Waqas</span>
+          </div>
+          <div class="table-row">
+            <span class="cell-label"><i class="fa-solid fa-building-columns"></i> Institute:</span>
+            <span class="cell-val">IGEO, PMAS-AAUR</span>
+          </div>
+          <div class="table-row">
+            <span class="cell-label"><i class="fa-solid fa-map"></i> Assigned City:</span>
+            <span class="cell-val bold-accent">Islamabad</span>
+          </div>
+          <div class="table-row">
+            <span class="cell-label"><i class="fa-solid fa-tags"></i> Assigned Category:</span>
+            <span class="cell-val bold-accent">Mosque</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- GIS & Web Architecture Components -->
+      <section class="section-card">
+        <div class="section-label">
+          <i class="fa-solid fa-layer-group"></i> Architecture & Stack
+        </div>
+        <ul class="tech-spec-list">
+          <li>
+            <i class="fa-solid fa-map"></i>
+            <div>
+              <strong>OpenStreetMap (OSM)</strong>
+              <span>Global open spatial database providing worldwide road networks, landmarks, and standard tiles.</span>
+            </div>
+          </li>
+          <li>
+            <i class="fa-solid fa-code"></i>
+            <div>
+              <strong>Leaflet.js v1.9.4</strong>
+              <span>Lightweight open-source JavaScript library for interactive mobile-friendly maps.</span>
+            </div>
+          </li>
+          <li>
+            <i class="fa-solid fa-satellite-dish"></i>
+            <div>
+              <strong>HTML5 Geolocation API</strong>
+              <span>High-accuracy W3C browser position triangulation (GPS/Wi-Fi/Cellular).</span>
+            </div>
+          </li>
+          <li>
+            <i class="fa-solid fa-network-wired"></i>
+            <div>
+              <strong>OSRM Driving Routing API</strong>
+              <span>Open Source Routing Machine HTTP service for high-performance route generation.</span>
+            </div>
+          </li>
+        </ul>
+      </section>
+
+      <!-- Live Map Telemetry -->
+      <section class="section-card telemetry-card">
+        <div class="section-label">
+          <i class="fa-solid fa-satellite"></i> Map Telemetry
+        </div>
+        <div class="telemetry-item">
+          <span>Zoom Level:</span>
+          <strong id="telem-zoom">13</strong>
+        </div>
+        <div class="telemetry-item">
+          <span>Center Lat/Lng:</span>
+          <strong id="telem-center">33.7150, 73.0550</strong>
+        </div>
+        <div class="telemetry-item">
+          <span>Cursor Lat/Lng:</span>
+          <strong id="telem-cursor">Hover over map</strong>
+        </div>
+      </section>
+    </aside>
+
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <!-- Application Logic -->
+  <script src="script.js"></script>
+</body>
+</html>
